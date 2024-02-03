@@ -1,20 +1,15 @@
 const Mensaje = require('../models/mensajes');
-let messages = [];
+let nuevosMensajes = [];
 
-const recibirMensaje = async (req, res) => {
+const recibirMensajes = async (req, res) => {
     try {
         const mensajes = await Mensaje.find();
-        messages.push(...mensajes);
-
-        const esperarMensajes = () => {
-            if (messages.length > 0) {
-                res.status(200).json(messages);
-                messages = [];
-            } else {
-                setTimeout(esperarMensajes, 1000);
+        const esperarMensaje = () => {
+            if (mensajes.length > 0) {
+                res.status(200).json(mensajes);
             }
         };
-        esperarMensajes();
+        esperarMensaje();
 
     } catch (error) {
         return res.status(500).json({
@@ -23,6 +18,24 @@ const recibirMensaje = async (req, res) => {
         });
     }
 }
+
+/*const recibirNuevoMensaje = async (req, res) => {
+    try {
+        const mensaje = mensajes[mensajes.length - 1];
+        const esperarMensaje = () => {
+            if (mensaje) {
+                res.status(200).json(mensaje);
+            }
+        };
+        esperarMensaje();
+
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Error al cargar los mensajes',
+            error: error.message
+        });
+    }
+}*/
 
 const enviarMensaje = async (req, res) => {
     const { usuario, mensaje } = req.body;
@@ -44,6 +57,7 @@ const enviarMensaje = async (req, res) => {
 };
 
 module.exports = {
-    recibirMensaje,
-    enviarMensaje
+    recibirMensajes,
+    //recibirNuevoMensaje,
+    enviarMensaje,
 }

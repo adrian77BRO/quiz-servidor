@@ -7,13 +7,13 @@ const notifRoute = require('./src/routes/notif.route');
 const mensajeRoute = require('./src/routes/mensajes.route');
 require('./src/database');
 
-const { handleWebSocketConnection } = require('./websockets/websockets');
+const { handleWebSocketConnection } = require('./socket/socket');
 const app = express();
 const server = http.createServer(app);
 
 app.use(cors());
 app.use(express.json());
-app.use('/notif', notifRoute);
+app.use('/notifs', notifRoute);
 app.use('/mensajes', mensajeRoute);
 const wss = new WebSocket.Server({ noServer: true });
 

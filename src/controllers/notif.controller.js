@@ -2,7 +2,8 @@ const Notificacion = require('../models/notificaciones');
 
 const obtenerNotif = async (req, res) => {
     try {
-        const notif = await Notificacion.find();
+        const notifs = await Notificacion.find();
+        const notif = notifs[notifs.length - 1].cuerpo
 
         return res.status(200).json(notif);
 
@@ -15,10 +16,10 @@ const obtenerNotif = async (req, res) => {
 }
 
 const agregarNotif = async (req, res) => {
-    const { fecha, cuerpo } = req.body;
+    const { cuerpo } = req.body;
     try {
         const nuevaNotif = new Notificacion({
-            fecha, cuerpo
+            cuerpo
         });
         await nuevaNotif.save();
 
