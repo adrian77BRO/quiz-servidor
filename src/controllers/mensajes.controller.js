@@ -1,15 +1,10 @@
 const Mensaje = require('../models/mensajes');
-let nuevosMensajes = [];
+let clientes = [];
 
 const recibirMensajes = async (req, res) => {
     try {
         const mensajes = await Mensaje.find();
-        const esperarMensaje = () => {
-            if (mensajes.length > 0) {
-                res.status(200).json(mensajes);
-            }
-        };
-        esperarMensaje();
+        return res.status(200).json(mensajes);
 
     } catch (error) {
         return res.status(500).json({
@@ -19,23 +14,24 @@ const recibirMensajes = async (req, res) => {
     }
 }
 
-/*const recibirNuevoMensaje = async (req, res) => {
+const recibirNuevoMensaje = (req, res) => {
     try {
-        const mensaje = mensajes[mensajes.length - 1];
-        const esperarMensaje = () => {
-            if (mensaje) {
-                res.status(200).json(mensaje);
+        clientes.push(res);
+
+        req.on('close', () => {
+            const index = clientes.indexOf(res);
+            if (index !== -1) {
+                clientes.splice(index, 1);
             }
-        };
-        esperarMensaje();
+        });
 
     } catch (error) {
         return res.status(500).json({
-            message: 'Error al cargar los mensajes',
+            message: 'Error al cargar el mensaje',
             error: error.message
         });
     }
-}*/
+}
 
 const enviarMensaje = async (req, res) => {
     const { usuario, mensaje } = req.body;
@@ -45,19 +41,28 @@ const enviarMensaje = async (req, res) => {
         });
         await nuevoMensaje.save();
 
+        responderClientes(nuevoMensaje);
+
         res.status(201).json({
-            message: 'Mensaje enviado'
-        });
+            message: "Mensaje enviado"
+        })
+
     } catch (error) {
-        res.status(500).json({
+        return res.status(500).json({
             message: "Error al enviar el mensaje",
             error: error.message
         });
     }
 };
 
+function responderClientes(nuevoMensaje) {
+    for (const res of clientes) {
+        res.status(200).json(nuevoMensaje);
+    }
+}
+
 module.exports = {
     recibirMensajes,
-    //recibirNuevoMensaje,
+    recibirNuevoMensaje,
     enviarMensaje,
 }
